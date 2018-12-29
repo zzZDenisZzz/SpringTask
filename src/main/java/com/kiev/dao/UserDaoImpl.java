@@ -1,9 +1,9 @@
 package com.kiev.dao;
 
 import com.kiev.entity.User;
-import com.kiev.mapper.UserMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.kiev.utils.HibernateSessionFactoryUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,35 +11,36 @@ import java.util.List;
 @Repository
 public class UserDaoImpl implements UserDao {
 
-    private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public UserDaoImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
     public void save(User user) {
-        String sql = "INSERT INTO user (name, email, age) VALUES (?,?,?)";
-        jdbcTemplate.update(sql, user.getName(), user.getEmail(), user.getAge());
+        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        session.save(user);
+        transaction.commit();
+        session.close();
     }
 
-    public User getById(int id) {
-        String sql = "SELECT * FROM user WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, new UserMapper(), id);
+    public User findById(int id) {
+        return HibernateSessionFactoryUtil.getSessionFactory().openSession().get(User.class, id);
     }
 
-    public void delete(int id) {
-        String sql = "DELETE FROM user WHERE id = ?";
-        jdbcTemplate.update(sql, id);
+    public void delete(User user) {
+        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        session.delete(user);
+        transaction.commit();
+        session.close();
     }
 
     public void update(User user) {
-        String sql = "UPDATE user SET name = ?,email = ?,age = ? WHERE id = ?";
-        jdbcTemplate.update(sql, user.getName(), user.getEmail(), user.getAge(), user.getId());
+        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        session.update(user);
+        transaction.commit();
+        session.close();
     }
 
     public List<User> findAll() {
-        String sql = "SELECT * FROM user";
-        return jdbcTemplate.query(sql, new UserMapper());
+        return (List<User>) HibernateSessionFactoryUtil.getSessionFactory().openSession()
+                .createQuery("From com.kiev.entity.User").list();
     }
 }

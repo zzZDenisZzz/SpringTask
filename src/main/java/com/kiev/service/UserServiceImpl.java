@@ -10,8 +10,13 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
+
+    private UserDao userDao;
+
     @Autowired
-    public UserDao userDao;
+    public UserServiceImpl(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     public List<User> findAll() {
         return userDao.findAll();
@@ -21,15 +26,15 @@ public class UserServiceImpl implements UserService {
         userDao.save(user);
     }
 
-    public User getById(int id) {
-        return userDao.getById(id);
+    public User findById(int id) {
+        return userDao.findById(id);
     }
 
     public void update(User user) {
         userDao.update(user);
     }
 
-    public void delete(int id) {
-        userDao.delete(id);
+    public void delete(User user) {
+        userDao.delete(user);
     }
 }

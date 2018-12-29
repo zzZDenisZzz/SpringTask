@@ -9,9 +9,9 @@ public interface UserService {
 
     void save(User user);
 
-    User getById(int id);
+    User findById(int id);
 
     void update(User user);
 
-    void delete(int id);
+    void delete(User user);
 }
